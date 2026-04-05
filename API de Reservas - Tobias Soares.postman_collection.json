@@ -1,0 +1,304 @@
+{
+  "info": {
+    "_postman_id": "2d62d008-c6f1-4a54-8d85-49b7093e84d4",
+    "name": "API de Reservas - Tobias Soares",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "49551028",
+    "_collection_link": "https://go.postman.co/collection/49551028-2d62d008-c6f1-4a54-8d85-49b7093e84d4?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Healt Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/ping",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "ping"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Gerar Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "//Validar status\r",
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "//Extrair token e salvar\r",
+              "var jsonData = pm.response.json();\r",
+              "pm.environment.set(\"token\", jsonData.token);\r",
+              "\r",
+              "console.log(\"Token gerado e salvo: \" + jsonData.token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\" : \"admin\",\r\n    \"password\" : \"password123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/auth",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Criar reserva",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "//Valida a criação\r",
+              "pm.test(\"Status code is 200 - Reserva criada\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "//Extrai o Id da reserva\r",
+              "var jsonData = pm.response.json();\r",
+              "pm.environment.set(\"bookingid\", jsonData.bookingid);\r",
+              "\r",
+              "\r",
+              "//Valida dados da reserva\r",
+              "pm.test(\"Valida nome do hóspede\", function () {\r",
+              "    pm.expect(jsonData.booking.firstname).to.eql(\"Tobias\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Validar se o depósito doi pago\", function() {\r",
+              "    pm.expect(jsonData.booking.depositpaid).to.be.true;\r",
+              "})"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"firstname\": \"Tobias\",\r\n    \"lastname\": \"Soares\",\r\n    \"totalprice\": 150,\r\n    \"depositpaid\": true,\r\n    \"bookingdates\" : {\r\n        \"checkin\" : \"2026-05-01\",\r\n        \"checkout\" : \"2026-05-10\"\r\n    },\r\n    \"additionalneeds\" : \"Café da manhã\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/booking",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "booking"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Consultar reserva por ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "//Valida se a busca retorna sucesso\r",
+              "pm.test(\"Status code is 200 - Busca realizada\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "//Valida a estrutura do JSON\r",
+              "var jsonData = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Valida se os campos obrigatórios existem\", function () {\r",
+              "    pm.expect(jsonData).to.have.property(\"firstname\");\r",
+              "    pm.expect(jsonData).to.have.property(\"lastname\");\r",
+              "    pm.expect(jsonData).to.have.property(\"bookingdates\");\r",
+              "});\r",
+              "\r",
+              "//Valida consistência dos dados\r",
+              "pm.test(\"O sobrenome deve ser 'Soares' \", function () {\r",
+              "    pm.expect(jsonData.lastname).to.eql(\"Soares\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/booking/{{bookingid}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "booking",
+            "{{bookingid}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Atualizar reserva",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 - Atualizado com sucesso\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "var jsonData = pm.response.json();\r",
+              "pm.test(\"Verifica se o campo 'lastname' foi atualizado\", function (){\r",
+              "    pm.expect(jsonData.lastname).to.eql(\"Soares atualizado\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Verifica se o campo 'totalprice' foi atualizado\", function(){\r",
+              "    pm.expect(jsonData.totalprice).to.eql(200);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "token={{token}}",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"firstname\" : \"Tobias\",\r\n    \"lastname\" : \"Soares atualizado\",\r\n    \"totalprice\" : 200,\r\n    \"depositpaid\" : true,\r\n    \"bookingdates\" : {\r\n        \"checkin\" : \"2026-05-01\",\r\n        \"checkout\" : \"2026-05-15\"\r\n    },\r\n    \"additionalneeds\" : \"Café da manhã e Almoço\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/booking/{{bookingid}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "booking",
+            "{{bookingid}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Deletar reserva",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201 - Excluído com sucesso\", function () {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Corpo da resposta contém 'Created'\", function () {\r",
+              "    pm.expect(pm.response.text()).to.include('Created');\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "token={{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/booking/{{bookingid}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "booking",
+            "{{bookingid}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
