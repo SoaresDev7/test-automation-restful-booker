@@ -17,7 +17,7 @@ describe('API RestFul-Booker - Fluxo completo de Reserva', () => {
   });
 
 
-
+  //Suíte de configuração e smoke tests
   it('TC01 - Health check: Deve verificar se a API está online', () => {
     cy.request('/ping').then((response) => {
       expect(response.status).to.eq(201);
@@ -54,6 +54,8 @@ describe('API RestFul-Booker - Fluxo completo de Reserva', () => {
   });
 
 
+
+  //Fluxo funcional
   it('TC04 - Criar reserva: Validar criação de novo registro', () => {
     const checkinDate = new Date().toISOString().split('T')[0];
 
@@ -125,13 +127,164 @@ describe('API RestFul-Booker - Fluxo completo de Reserva', () => {
   });
 
 
-  it('TC08 - Segurança: Validar que a reserva foi excluída', () => {
+
+  //Negativos, segurança e Edge cases
+  it('TC08 - Consulta ID inexistente: Validar erro 404', () => {
     cy.request({
-      url: `/booking/${bookingId}`,
+      url: '/booking/99999999',
       failOnStatusCode: false
     }).then((response) => {
       expect(response.status).to.eq(404);
     });
   });
+
+  it('TC09 - Atualização sem token: Garantir proteção 403', () => {
+    cy.request({
+      method: 'PUT',
+      url: `/booking/${bookingId}`,
+      failOnStatusCode: false,
+      body: { firstname: "Hacker"}
+    }).then((response) => {
+      expect(response.status).to.eq(403);
+    });
+  });
+
+  it('TC10 - Criar dado inválido: Testar robustez do sistema', () => {
+    cy.request({
+      method: 'POST',
+      url: '/booking',
+      failOnStatusCode: false,
+      body: {
+        totalprice: "muito caro"
+      }
+    }).then((response) => {
+      expect(response.status).to.be.oneOf([400,500]);
+    });
+  });
+
+  it('TC11 - Deletar token inválido: Verificar resiliÊncia', () => {
+    cy.request({
+      method: 'DELETE',
+      url: `/booking/${bookingId}`,
+      headers: {
+        Cookie: 'token=invalido123'
+      },
+      failOnStatusCode: false
+    }).then((response) => {
+      expect(response.status).to.eq(403);
+    });
+  });
+
+  it('TC12 - Header accept inválido: Testar conformidade', () => {
+    cy.request({
+      url: `/booking`,
+      headers: {
+        Accept: 'text/plain'
+      },
+    }).then((response) => {
+      expect(response.status).to.be.oneOf([200,404,406]);
+    });
+  });
+
+
+  it('TC13 - Payload vazio: Garantir que não processe sem dados', () => {
+    cy.request({
+      method: 'POST',
+      url: '/booking',
+      failOnStatusCode: false,
+      body: {}
+    }).then((response) => {
+      expect(response.status).to.eq(500);
+    });
+  });
+
+
+
+  //Regras de negócio (Bugs)
+  it('TC14 - BUG: Checkout retroativo', () => {
+    cy.request({
+      method: 'POST',
+      url: '/booking',
+      body: {
+        firstname: "Teste",
+        lastname: "Bug",
+        totalprice: 100,
+        depositpaid: true,
+        bookingdates: {
+          checkin: "2026-05-10",
+          checkout: "2026-05-01"
+        },
+        addtionalneeds: "Não"
+      }
+    }).then((response) => {
+      expect(response.status).to.eq(200);
+    });
+  });
+
+  it('TC15 - BUG: Preço negativo', () => {
+    cy.request({
+      method: 'POST',
+      url: '/booking',
+      body: {
+        firstname: "Teste",
+        lastname: "Financeiro",
+        totalprice: -100,
+        depositpaid: true,
+        bookingdates: {
+          checkin: "2026-05-01",
+          checkout: "2026-05-10"
+        },
+        addtionalneeds: "Não"
+      }
+    }).then((response) => {
+      expect(response.status).to.eq(200);
+    });
+  });
+
+  it('TC16 - BUG: Tipagem de dados', () => {
+    cy.request({
+      method: 'POST',
+      url: '/booking',
+      body: {
+        firstname: "Teste",
+        lastname: "Tipagem",
+        totalprice: "Um mil",
+        depositpaid: true,
+        bookingdates: {
+          checkin: "2026-05-01",
+          checkout: "2026-05-10"
+        },
+        addtionalneeds: "Não"
+      }
+    }).then((response) => {
+      expect(response.status).to.eq(200);
+    });
+  });
+
+
+  //Qualidade, performance e contrato
+  it('TC17 - Validar contrato e SLA de resposta (<1000ms)', () => {
+    cy.request('/booking').then((response) => {
+      expect(response.duration).to.be.lessThan(1000);
+
+      expect(response.status).to.eq(200);
+      expect(response.body).to.be.an('array');
+      if(response.body.length > 0) {
+        expect(response.body[0]).to.have.property('bookingid');
+      }
+    });
+  });
+
+
+
+
+
+
+
+
+
+
+
+
 
 });
