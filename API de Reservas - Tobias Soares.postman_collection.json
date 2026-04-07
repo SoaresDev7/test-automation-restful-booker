@@ -2,37 +2,175 @@
   "info": {
     "_postman_id": "2d62d008-c6f1-4a54-8d85-49b7093e84d4",
     "name": "API de Reservas - Tobias Soares",
+    "description": "# **Projeto de Automação de Testes de API - Restful-Booker**\n\nEste projeto faz parte do meu portfólio. Ele consiste na automação completa da suíte de testes da API de reservas de hotel **Restful-Booker**, cobrindo desde o fluxo funcional (CRUD) até testes de segurança, contrato e regras de negócio.\n\n## Sobre a API\n\nA **Restful-Booker** é uma API pública para treinamento de testes de software, que simula um sistema de reservas de hotel.\n\n- **Documentação Oficial:** [Restful-Booker API Docs](https://www.google.com/search?q=https://restful-booker.herokuapp.com/apidoc/index.html)\n    \n\n## Configurações Necessárias\n\nPara executar esta collection, é necessário configurar um **Environment (Ambiente)** no Postman com as seguintes variáveis:\n\n| **Variável** | **Valor Sugerido** | **Descrição** |\n| `base_url` | `https://restful-booker.herokuapp.com` | URL base do ambiente de testes. |\n| `token` | _(Gerado automaticamente no TC02)_ | Credencial de acesso para métodos PUT/DELETE. |\n| `bookingid` | _(Gerado automaticamente no TC04)_ | ID da reserva utilizada no fluxo de teste. |\n\n---\n\n## Estrutura da Suíte de Testes\n\nA collection está organizada para refletir uma pirâmide de testes eficiente:\n\n1. **Suíte de Configuração:** Health Check e Autenticação.\n    \n2. **Fluxo Funcional:** Ciclo de vida completo da reserva (Criar, Consultar, Atualizar e Deletar).\n    \n3. **Testes Negativos:** Validação de segurança (403/404) e tratamento de erros.\n    \n4. **Regras de Negócio (Bugs):** Identificação de falhas críticas de lógica (Datas retroativas, valores negativos e tipagem).\n    \n5. **Qualidade & Performance:** Validação de **JSON Schema** e monitoramento de **SLA (S < 1000ms)**.\n    \n\n---\n\n## Bugs Identificados\n\nDurante o desenvolvimento, foram identificados e documentados **3 bugs críticos** de regra de negócio, onde a API permite a persistência de dados logicamente impossíveis. Os testes estão configurados para acusar essas falhas (ficando vermelhos) e exibir logs explicativos no console.\n\n---\n\n## Contato e Portfólio\n\nEstou à disposição para dúvidas técnicas sobre a estrutura deste projeto ou para uma demonstração ao vivo da execução.\n\n- **LinkedIn:** [linkedin.com/in/tobias-soares](https://www.linkedin.com/in/tobias-soares-639721364/)\n    \n- **GitHub:** [https://github.com/SoaresDev7](https://github.com/SoaresDev7)\n    \n- **E-mail:** devsoares05@gmail.com",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "49551028",
     "_collection_link": "https://go.postman.co/collection/49551028-2d62d008-c6f1-4a54-8d85-49b7093e84d4?source=collection_link"
   },
   "item": [
     {
-      "name": "Fluxo funcional",
+      "name": "Suite de configuração",
       "item": [
         {
-          "name": "Criar reserva",
+          "name": "TC01 - Health Check",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "//Valida a criação\r",
-                  "pm.test(\"Status code is 200 - Reserva criada\", function () {\r",
+                  "pm.test(\"TC01 - Health Check - Validar status 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ping",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ping"
+              ]
+            },
+            "description": "Verifica a disponibilidade do servidor da API.\n\n- **Objetivo:** Garantir que o ambiente de testes está online antes de iniciar a execução da suíte.\n    \n- **Esperado:** Status Code `201 Created`"
+          },
+          "response": []
+        },
+        {
+          "name": "TC02 - Gerar Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "pm.test(\"TC02 - Gerar token - Validar status 200\", function () {\r",
                   "    pm.response.to.have.status(200);\r",
                   "});\r",
                   "\r",
-                  "//Extrai o Id da reserva\r",
+                  "var jsonData = pm.response.json();\r",
+                  "pm.environment.set(\"token\", jsonData.token);\r",
+                  "\r",
+                  "console.log(\"TC02 - Gerar token - Armazenar token no ambiente\" + jsonData.token);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\" : \"admin\",\r\n    \"password\" : \"password123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth"
+              ]
+            },
+            "description": "Realiza a autenticação do usuário administrador.\n\n- **Objetivo:** Obter o token de acesso necessário para operações de escrita (PUT/DELETE).\n    \n- **Esperado:** Status Code `200 OK` e retorno de um token válido no JSON."
+          },
+          "response": []
+        },
+        {
+          "name": "TC03 - Login inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"TC03 - Login Inválido - Validar Status 200\", function(){\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"TC03 - Login inválido - Validar mensagem 'Bad credentials'\", function(){\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.reason).to.eql(\"Bad credentials\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"TC03 - Login inválido - Garantir ausência de token\", function(){\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.token).to.be.undefined;\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"senha_errada_123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth"
+              ]
+            },
+            "description": "Tenta realizar a autenticação com credenciais incorretas.\n\n- **Objetivo:** Validar se a API bloqueia acessos não autorizados.\n    \n- **Esperado:** Status Code `200 OK` com a mensagem `\"Reason: Bad credentials\"`."
+          },
+          "response": []
+        }
+      ],
+      "description": "StartFragmentEstes testes garantem que o \"terreno\" está pronto.EndFragment"
+    },
+    {
+      "name": "Fluxo funcional",
+      "item": [
+        {
+          "name": "TC04 - Criar reserva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "pm.test(\"TC04 - Criar reserva - Validar status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
                   "var jsonData = pm.response.json();\r",
                   "pm.environment.set(\"bookingid\", jsonData.bookingid);\r",
                   "\r",
                   "\r",
-                  "//Valida dados da reserva\r",
-                  "pm.test(\"Valida nome do hóspede\", function () {\r",
+                  "pm.test(\"TC04 - Criar reserva - Validar nome do hóspede\", function () {\r",
                   "    pm.expect(jsonData.booking.firstname).to.eql(\"Tobias\");\r",
                   "});\r",
                   "\r",
-                  "pm.test(\"Validar se o depósito doi pago\", function() {\r",
+                  "pm.test(\"TC04 - Criar reserva - Validar status do depósito\", function() {\r",
                   "    pm.expect(jsonData.booking.depositpaid).to.be.true;\r",
                   "})"
                 ],
@@ -62,34 +200,55 @@
               "path": [
                 "booking"
               ]
-            }
+            },
+            "description": "Registra uma nova reserva no sistema com dados íntegros.\n\n- **Objetivo:** Validar o processamento do payload e a persistência inicial dos dados.\n    \n- **Esperado:** Status Code `200 OK` e geração de um `bookingid`"
           },
           "response": []
         },
         {
-          "name": "Consultar reserva por ID",
+          "name": "TC05 - Consultar reserva por ID",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "//Valida se a busca retorna sucesso\r",
-                  "pm.test(\"Status code is 200 - Busca realizada\", function () {\r",
+                  "pm.test(\"TC05 - Consultar reserva - Validar status 200\", function () {\r",
                   "    pm.response.to.have.status(200);\r",
                   "});\r",
                   "\r",
-                  "//Valida a estrutura do JSON\r",
                   "var jsonData = pm.response.json();\r",
                   "\r",
-                  "pm.test(\"Valida se os campos obrigatórios existem\", function () {\r",
+                  "pm.test(\"TC05 - Consultar reserva - Validar campos obrigatórios\", function () {\r",
                   "    pm.expect(jsonData).to.have.property(\"firstname\");\r",
                   "    pm.expect(jsonData).to.have.property(\"lastname\");\r",
                   "    pm.expect(jsonData).to.have.property(\"bookingdates\");\r",
                   "});\r",
                   "\r",
-                  "//Valida consistência dos dados\r",
-                  "pm.test(\"O sobrenome deve ser 'Soares' \", function () {\r",
+                  "pm.test(\"TC05 - Consultar reserva - Validar sobrenome do hóspede\", function () {\r",
                   "    pm.expect(jsonData.lastname).to.eql(\"Soares\");\r",
+                  "});\r",
+                  "\r",
+                  "const schema = {\r",
+                  "    \"type\": \"object\",\r",
+                  "    \"required\": [\"firstname\", \"lastname\", \"totalprice\", \"depositpaid\", \"bookingdates\"],\r",
+                  "    \"properties\": {\r",
+                  "        \"firstname\": { \"type\": \"string\" },\r",
+                  "        \"lastname\": { \"type\": \"string\" },\r",
+                  "        \"totalprice\": { \"type\": \"number\" },\r",
+                  "        \"depositpaid\": { \"type\": \"boolean\" },\r",
+                  "        \"bookingdates\": {\r",
+                  "            \"type\": \"object\",\r",
+                  "            \"required\": [\"checkin\", \"checkout\"],\r",
+                  "            \"properties\": {\r",
+                  "                \"checkin\": { \"type\": \"string\" },\r",
+                  "                \"checkout\": { \"type\": \"string\" }\r",
+                  "            }\r",
+                  "        }\r",
+                  "    }\r",
+                  "};\r",
+                  "\r",
+                  "pm.test(\"TC17 - Consultar reserva - Validar contrato JSON Schema\", function(){\r",
+                  "    pm.response.to.have.jsonSchema(schema);\r",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -110,27 +269,28 @@
                 "booking",
                 "{{bookingid}}"
               ]
-            }
+            },
+            "description": "Busca os detalhes de uma reserva específica utilizando o ID gerado no TC04.\n\n- **Objetivo:** Validar a integridade dos dados retornados pelo banco de dados e conformidade do contrato (JSON Schema).\n    \n- **Esperado:** Status Code `200 OK` e campos correspondentes ao registro criado"
           },
           "response": []
         },
         {
-          "name": "Atualizar reserva",
+          "name": "TC06 - Atualizar reserva",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status code is 200 - Atualizado com sucesso\", function () {\r",
+                  "pm.test(\"TC06 - Atualizar reserva - Validar status 200\", function () {\r",
                   "    pm.response.to.have.status(200);\r",
                   "});\r",
                   "\r",
                   "var jsonData = pm.response.json();\r",
-                  "pm.test(\"Verifica se o campo 'lastname' foi atualizado\", function (){\r",
+                  "pm.test(\"TC06 - Atualizar reserva - Validar atualização do sobrenome\", function (){\r",
                   "    pm.expect(jsonData.lastname).to.eql(\"Soares atualizado\");\r",
                   "});\r",
                   "\r",
-                  "pm.test(\"Verifica se o campo 'totalprice' foi atualizado\", function(){\r",
+                  "pm.test(\"TC06 - Atualizar reserva - Validar atualização do preço\", function(){\r",
                   "    pm.expect(jsonData.totalprice).to.eql(200);\r",
                   "});"
                 ],
@@ -176,22 +336,23 @@
                 "booking",
                 "{{bookingid}}"
               ]
-            }
+            },
+            "description": "Edita os dados de uma reserva existente via método PUT.\n\n- **Objetivo:** Verificar se o sistema permite a alteração de campos como `lastname` e `totalprice` mediante autenticação.\n    \n- **Esperado:** Status Code `200 OK` e dados atualizados no corpo da resposta."
           },
           "response": []
         },
         {
-          "name": "Deletar reserva",
+          "name": "TC07 - Deletar reserva",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status code is 201 - Excluído com sucesso\", function () {\r",
+                  "pm.test(\"TC07 - Deletar reserva - Validar status 201\", function () {\r",
                   "    pm.response.to.have.status(201);\r",
                   "});\r",
                   "\r",
-                  "pm.test(\"Corpo da resposta contém 'Created'\", function () {\r",
+                  "pm.test(\"TC07 - Deletar reserva - Validar mensagem de confirmação\", function () {\r",
                   "    pm.expect(pm.response.text()).to.include('Created');\r",
                   "});"
                 ],
@@ -219,7 +380,8 @@
                 "booking",
                 "{{bookingid}}"
               ]
-            }
+            },
+            "description": "Remove permanentemente uma reserva do banco de dados.\n\n- **Objetivo:** Validar a exclusão física do registro e a segurança do endpoint.\n    \n- **Esperado:** Status Code `201 Created`."
           },
           "response": []
         }
@@ -230,17 +392,17 @@
       "name": "Testes negativos e segurança",
       "item": [
         {
-          "name": "Consulta ID inexistente",
+          "name": "TC08 - Consulta ID inexistente",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status code é 404 - ID não encontrado\", function () {\r",
+                  "pm.test(\"TC08 - Consultar ID inexistente - Validar status 404\", function () {\r",
                   "    pm.response.to.have.status(404);\r",
                   "});\r",
                   "\r",
-                  "pm.test(\"Corpo da resposta deve estar vazio ou conter 'Not Found'\", function(){\r",
+                  "pm.test(\"TC08 - Consultar ID inexistente - Validar mensagem 'Not Found'\", function(){\r",
                   "    pm.expect(pm.response.text()).to.include(\"Not Found\");\r",
                   "});"
                 ],
@@ -268,18 +430,19 @@
                 "booking",
                 "9999999"
               ]
-            }
+            },
+            "description": "Tenta buscar uma reserva utilizando um ID que não consta na base.\n\n- **Objetivo:** Validar o tratamento de erro para recursos não encontrados.\n    \n- **Esperado:** Status Code `404 Not Found`."
           },
           "response": []
         },
         {
-          "name": "Atualização sem token",
+          "name": "TC09 - Atualização sem token",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status code é 403 - Acesso negado por falta de token\", function() {\r",
+                  "pm.test(\"TC09 - Atualizar sem token - Validar status 403 (Forbidden)\", function() {\r",
                   "    pm.response.to.have.status(403);\r",
                   "})\r",
                   "\r",
@@ -321,18 +484,19 @@
                 "booking",
                 "{{bookingid}}"
               ]
-            }
+            },
+            "description": "Tenta editar uma reserva sem enviar o cookie de autenticação.\n\n- **Objetivo:** Validar a segurança dos endpoints privados.\n    \n- **Esperado:** Status Code `403 Forbidden`."
           },
           "response": []
         },
         {
-          "name": "Criar reserva com dados inválidos",
+          "name": "TC10 - Criar reserva com dados inválidos",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status code é 400 ou 500 - API rejeitou o dado inválido\", function(){\r",
+                  "pm.test(\"TC10 - Criar dado inválido - Validar rejeição da API (status 400/500)\", function(){\r",
                   "    if(pm.response.code == 200){\r",
                   "        console.warn(\"Bug identificado: API acietou String em campo numérico.\")\r",
                   "        pm.expect(pm.response.code).to.equal(200, \"A API não deveria aceitar dados inválidos com status 200\");\r",
@@ -367,18 +531,19 @@
               "path": [
                 "booking"
               ]
-            }
+            },
+            "description": "Envia um payload com tipos de dados incoerentes (ex: letras em campos de data).\n\n- **Objetivo:** Testar a robustez do Back-end contra entradas malformadas.\n    \n- **Esperado:** Status Code `400 Bad Request` ou `500 Internal Server Error`."
           },
           "response": []
         },
         {
-          "name": "Token inválido",
+          "name": "TC11 - Token inválido",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status code é 403 - Forbidden para token inválido\", function(){\r",
+                  "pm.test(\"TC11 - Deletar token inválido - Validar status 403 (Forbidden)\", function(){\r",
                   "    pm.response.to.have.status(403);\r",
                   "})"
                 ],
@@ -410,18 +575,19 @@
                 "booking",
                 "{{bookingid}}"
               ]
-            }
+            },
+            "description": "Tenta realizar uma exclusão utilizando um token expirado ou malformado.\n\n- **Objetivo:** Verificar a validação rigorosa da credencial de acesso.\n    \n- **Esperado:** Status Code `403 Forbidden`"
           },
           "response": []
         },
         {
-          "name": "Header 'Accept' errado",
+          "name": "TC12 - Header 'Accept' errado",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Validação de negociação de conteúdo (Accept Header)\", function (){\r",
+                  "pm.test(\"TC12 - Validar negociação de conteúdo (Accept Header)\", function (){\r",
                   "    var expectedStatus = 418;\r",
                   "    if(pm.response.code == 404){\r",
                   "        console.warn(\"Divergência de documentação: Esperado 418, recebido 404.\");\r",
@@ -470,18 +636,19 @@
                 "booking",
                 "{{bookingid}}"
               ]
-            }
+            },
+            "description": "Solicita o retorno da API em um formato não suportado (ex: text/plain).\n\n- **Objetivo:** Validar a negociação de conteúdo (Content Negotiation).\n    \n- **Nota:** Identificada divergência entre a documentação (esperado 418) e a implementação (retorno 404)."
           },
           "response": []
         },
         {
-          "name": "Payload vazio",
+          "name": "TC13 - Payload vazio",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status code deve ser 400 ou 500 para payload vazio\", function(){\r",
+                  "pm.test(\"TC13 - Criar payload vazio - Validar rejeição da API\", function(){\r",
                   "    pm.expect(pm.response.code).to.be.oneOf([400,418,500], \"API aceitou um JSON vazio\");\r",
                   "});\r",
                   "\r",
@@ -516,110 +683,24 @@
               "path": [
                 "booking"
               ]
-            }
-          },
-          "response": []
-        }
-      ],
-      "description": "StartFragmentTestar como o sistema lida com o erro.EndFragment"
-    },
-    {
-      "name": "Suite de configuração",
-      "item": [
-        {
-          "name": "Healt Check",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 201\", function () {\r",
-                  "    pm.response.to.have.status(201);\r",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/ping",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "ping"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Gerar Token",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "//Validar status\r",
-                  "pm.test(\"Status code is 200\", function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  "\r",
-                  "//Extrair token e salvar\r",
-                  "var jsonData = pm.response.json();\r",
-                  "pm.environment.set(\"token\", jsonData.token);\r",
-                  "\r",
-                  "console.log(\"Token gerado e salvo: \" + jsonData.token);"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"username\" : \"admin\",\r\n    \"password\" : \"password123\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
             },
-            "url": {
-              "raw": "{{base_url}}/auth",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "auth"
-              ]
-            }
+            "description": "Envia uma requisição POST com o corpo do JSON vazio `{}`.\n\n- **Objetivo:** Garantir que o sistema não crie registros \"fantasmas\" sem informações obrigatórias.\n    \n- **Esperado:** Rejeição da API (Status 400 ou superior)."
           },
           "response": []
         }
-      ],
-      "description": "StartFragmentEstes testes garantem que o \"terreno\" está pronto.EndFragment"
+      ]
     },
     {
       "name": "Testes regra de negócio",
       "item": [
         {
-          "name": "Data de checkout retroativa",
+          "name": "TC14 - Data de checkout retroativa",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"API deve rejeitar checkout retroativo\", function(){\r",
+                  "pm.test(\"TC14 - Checkout retroativo - Impedir criação com data inválida\", function(){\r",
                   "    const statusCode = pm.response.code;\r",
                   "\r",
                   "    if(statusCode == 200){\r",
@@ -656,18 +737,18 @@
                 "booking"
               ]
             },
-            "description": "Data de checkout é antes da data de checkin"
+            "description": "Tenta criar reserva com checkout anterior ao checkin.\n\n- **Objetivo:** Validar a lógica temporal de reserva.\n    \n- **Status Atual:** **BUG IDENTIFICADO**. A API aceita datas logicamente impossíveis (Status 200)."
           },
           "response": []
         },
         {
-          "name": "Preço negativo",
+          "name": "TC15 - Preço negativo",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Impedir criação com preço negativo\", function(){\r",
+                  "pm.test(\"TC15 - Preço negativo - Impedir reserva com valor negativo\", function(){\r",
                   "    const statusCode = pm.response.code;\r",
                   "\r",
                   "    if(statusCode == 200) {\r",
@@ -703,18 +784,19 @@
               "path": [
                 "booking"
               ]
-            }
+            },
+            "description": "Tenta criar uma reserva com valor de `totalprice` negativo.\n\n- **Objetivo:** Validar a integridade financeira da regra de negócio.\n    \n- **Status Atual:** **BUG IDENTIFICADO**. A API permite valores negativos (Status 200)."
           },
           "response": []
         },
         {
-          "name": "Tipagem de dados",
+          "name": "TC16 - Tipagem de dados",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Impedir criação com tipo de dado inválido (String em campo numérico)\", function(){\r",
+                  "pm.test(\"TC16 - Tipagem de dados - Impedir string em campo numérico)\", function(){\r",
                   "    const statusCode = pm.response.code;\r",
                   "\r",
                   "    if(statusCode == 200){\r",
@@ -749,7 +831,8 @@
               "path": [
                 "booking"
               ]
-            }
+            },
+            "description": "Envia uma String (\"MIL REAIS\") em um campo que deveria ser numérico (`totalprice`).\n\n- **Objetivo:** Testar o Sanity Check (Validação de Sanidade) da API.\n    \n- **Status Atual:** **BUG IDENTIFICADO**. A API aceita texto em campos de número (Status 200)."
           },
           "response": []
         }
@@ -776,7 +859,7 @@
         "packages": {},
         "requests": {},
         "exec": [
-          "pm.test(\"Tempo de resposta dentro do SLA (1s)\", function () {\r",
+          "pm.test(\"Performance - Validar tempo de resposta dentro do SLA (1s)\", function () {\r",
           "    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
           "});"
         ]
