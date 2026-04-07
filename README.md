@@ -30,24 +30,40 @@ Durante a automação, identifiquei comportamentos divergentes da documentação
 ## Casos de Teste Implementados (TC)
 
 ### **1. Suíte de Configuração & Smoke Tests**
-*   **TC01 - Health Check (Ping):** Verifica se o servidor está online e respondendo (Status 201).
-*   **TC02 - Geração de Token:** Valida a autenticação bem-sucedida do administrador.
+* **TC01 - Health Check:** Verifica a disponibilidade do servidor (Status 201).
+* **TC02 - Gerar Token:** Valida a autenticação e armazena a credencial para operações privadas.
+* **TC03 - Login Inválido:** Garante que a API bloqueia acessos com credenciais incorretas.
 
-### **2. Fluxo Funcional (CRUD - Caminho Feliz)**
-*   **TC03 - Criar Reserva Válida:** Valida a criação de reservas com dados íntegros e datas futuras.
-*   **TC04 - Consulta por ID:** Garante que os dados salvos no banco estão idênticos ao enviado no POST.
-*   **TC05 - Atualização (PUT):** Testa a edição completa de uma reserva existente com token de acesso.
-*   **TC06 - Exclusão (DELETE):** Valida a remoção definitiva de uma reserva do sistema.
+### **2. Fluxo Funcional**
+* **TC04 - Criar Reserva:** Valida a criação de novos registros e captura o `bookingid`.
+* **TC05 - Consultar Reserva por ID:** Garante a persistência dos dados e validação do contrato (JSON Schema).
+* **TC06 - Atualizar Reserva:** Testa a edição completa (PUT) de uma reserva existente.
+* **TC07 - Deletar Reserva:** Valida a remoção definitiva do registro do sistema.
 
 ### **3. Negativos, Segurança & Edge Cases**
-*   **TC07 - ID Inexistente (GET):** Valida retorno 404 para recursos não encontrados.
-*   **TC08 - Falta de Token (PUT):** Garante proteção contra alterações não autorizadas (403).
-*   **TC09 - Token Inválido (DELETE):** Testa a resiliência do sistema contra tokens malformados.
-*   **TC10 - Payload Vazio (POST):** Verifica se a API bloqueia criações sem corpo de dados.
-*   **TC11 - Header Accept Errado:** Testa a negociação de conteúdo e retorno de erro de protocolo.
-*   **TC12 - Data Retroativa:** Identifica falha na lógica de check-in vs checkout.
-*   **TC13 - Preço Negativo:** Identifica falha na validação de valores monetários.
-*   **TC14 - Tipagem de Dados:** Testa se o sistema aceita Strings em campos numéricos (Sanity Check).
+* **TC08 - Consulta ID Inexistente:** Valida o tratamento de erro 404 para buscas sem sucesso.
+* **TC09 - Atualização Sem Token:** Garante a proteção de endpoints privados contra acessos não autorizados.
+* **TC10 - Criar Dado Inválido:** Testa a robustez do sistema contra entradas malformadas.
+* **TC11 - Deletar Token Inválido:** Verifica a resiliência contra tokens expirados ou incorretos.
+* **TC12 - Header Accept Errado:** Testa a negociação de conteúdo e conformidade com protocolos.
+* **TC13 - Payload Vazio:** Garante que a API não processe requisições sem corpo de dados.
 
-### **4. Performance & Contrato**
-*   **TC15 - SLA de Resposta:** Monitoramento de latência garantindo respostas em menos de **1000ms**.
+### **4. Regras de Negócio (Bugs Identificados)**
+* **TC14 - Checkout Retroativo:** Identifica falha lógica onde a API aceita datas de saída anteriores à entrada.
+* **TC15 - Preço Negativo:** Identifica falha na validação de integridade financeira para valores monetários.
+* **TC16 - Tipagem de Dados:** Identifica erro de sanidade ao aceitar Strings em campos numéricos.
+
+### **5. Qualidade, Performance & Contrato**
+* **TC17 - Validar Contrato JSON Schema:** Garante que a estrutura da resposta está conforme a documentação.
+* **SLA de Resposta:** Monitoramento global de latência garantindo respostas em menos de **1000ms**.
+
+
+##  Uso de Inteligência Artificial
+
+Este projeto utilizou modelos de linguagem avançados como o Gemini e o NotebookLM para acelerar o ciclo de desenvolvimento dos testes. O foco não foi a geração automática de código, mas sim o uso da IA como um revisor técnico e estrategista.
+
+### **Como a IA foi utilizada:**
+*   **Consulta direta na documentação da API:** Consulta à documentação da Restful-Book API para otimizar tempo e melhor legibilidade.
+*   **Refinamento de nomenclatura:** Padronização dos Test Cases (TCs) seguindo padrões de mercado para melhor legibilidade e manutenção.
+*   **Engenharia de Prompt para documentação:** Estruturação de descrições em Markdown para as requisições e para o README, garantindo uma comunicação técnica clara.
+*   **Análise de código:** Revisão de scripts de teste para identificar pontos de melhoria em asserções e mensagens de erro personalizadas.
