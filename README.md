@@ -1,11 +1,19 @@
 # Test Automation Project: Restful-Booker API
-Este projeto apresenta uma suíte de testes automatizados para a **Restful-Booker API**, utilizando **Postman** e **JavaScript**. O foco principal foi garantir a integridade dos dados, validar regras de negócio e identificar vulnerabilidades de segurança e performance.
+Este projeto apresenta uma suíte de testes automatizados para a **Restful-Booker API**, utilizando uma abordagem híbrida com **Postman** e **Cypress**. O foco principal foi garantir a integridade dos dados, validar regras de negócio e identificar vulnerabilidades de segurança e performance em camadas distintas.
 
 ## Tecnologias Utilizadas
 *   **Postman**: Criação e execução da suíte de testes.
+*   **Cypress**: Automação de testes de API end-to-end (E2E) e fluxos críticos.
 *   **JavaScript (Chai.js)**: Scripts de validação e asserções.
 *   **Collection Runner**: Execução em lote dos cenários de teste.
 *   **JSON Schema**: Validação de contrato de dados.
+*   **Node.js**: Ambiente de execução para as dependências de automação.
+
+## Estrutura do Repositório
+O projeto foi organizado para demonstrar versatilidade no uso de ferramentas de QA:
+*   `postman/` : Contém a Collection e o Environment prontos para a importação.
+*   `cypress/` : Contém os scripts de automação (`/e2e/booking.cy.js`) e configurações.
+*   `README.md` : Documentação técnica e relatórios de bugs.
 
 ## Estratégia de Testes
 A suíte foi dividida em três camadas principais para garantir uma cobertura de 360°:
@@ -57,6 +65,20 @@ Durante a automação, identifiquei comportamentos divergentes da documentação
 * **TC17 - Validar Contrato JSON Schema:** Garante que a estrutura da resposta está conforme a documentação.
 * **SLA de Resposta:** Monitoramento global de latência garantindo respostas em menos de **1000ms**.
 
+## Como Executar
+
+### Via Postman
+1. Importe os arquivos da pasta `/postman` para o seu workspace.
+2. Selecione o ambiente `Hospedagem`.
+3. Utilize o **Collection Runner** para executar todos os TCs em lote.
+
+### Via Cypress
+1. Clone o repositório e acesse a pasta raiz.
+2. Instale as dependências: `npm install`.
+3. Execute os testes:
+  * Interface Gráfica: `npx cypress open`
+  * Modo Headless: `npx cypress run`
+
 
 ##  Uso de Inteligência Artificial
 
@@ -67,3 +89,11 @@ Este projeto utilizou modelos de linguagem avançados como o Gemini e o Notebook
 *   **Refinamento de nomenclatura:** Padronização dos Test Cases (TCs) seguindo padrões de mercado para melhor legibilidade e manutenção.
 *   **Engenharia de Prompt para documentação:** Estruturação de descrições em Markdown para as requisições e para o README, garantindo uma comunicação técnica clara.
 *   **Análise de código:** Revisão de scripts de teste para identificar pontos de melhoria em asserções e mensagens de erro personalizadas.
+
+
+## Autor
+
+### Tobias Soares
+*Estudante de Ciências da Computação | Java Back-end Developer*
+
+[GitHub](https://www.google.com/search?q=https://github.com/SoaresDev7) | [LinkedIn](https://www.linkedin.com/in/tobias-soares-639721364/)
