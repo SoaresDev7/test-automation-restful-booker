@@ -34,6 +34,20 @@ Durante a automação, identifiquei comportamentos divergentes da documentação
 | **BUG-04** | **Baixa** | Divergência de Documentação (Accept Header). | Status `418 I'm a teapot`. | Status `404 Not Found`. |
 
 ---
+## Tabela de Cobertura de Endpoints
+
+| Método | Endpoint | Recurso | Coberto? |
+| :--- | :--- | :--- | :--- |
+| GET | /ping | Health Check | ✅ |
+| POST | /auth | Autenticação | ✅ |
+| GET | /booking | Listagem de Reservas | ✅ |
+| GET | /booking/:id | Detalhes da Reserva | ✅ |
+| POST | /booking | Criação de Reserva | ✅ |
+| PUT | /booking/:id | Atualização Total | ✅ |
+| PATCH | /booking/:id | Atualização Parcial | ✅ |
+| DELETE | /booking/:id | Exclusão de Reserva | ✅ |
+
+---
 
 ## Casos de Teste Implementados (TC)
 
@@ -65,6 +79,8 @@ Durante a automação, identifiquei comportamentos divergentes da documentação
 * **TC17 - Validar Contrato JSON Schema:** Garante que a estrutura da resposta está conforme a documentação.
 * **SLA de Resposta:** Monitoramento global de latência garantindo respostas em menos de **1000ms**.
 
+---
+
 ## Como Executar
 
 ### Via Postman
@@ -79,6 +95,7 @@ Durante a automação, identifiquei comportamentos divergentes da documentação
   * Interface Gráfica: `npx cypress open`
   * Modo Headless: `npx cypress run`
 
+---
 
 ##  Uso de Inteligência Artificial
 
@@ -90,10 +107,19 @@ Este projeto utilizou modelos de linguagem avançados como o Gemini e o Notebook
 *   **Engenharia de Prompt para documentação:** Estruturação de descrições em Markdown para as requisições e para o README, garantindo uma comunicação técnica clara.
 *   **Análise de código:** Revisão de scripts de teste para identificar pontos de melhoria em asserções e mensagens de erro personalizadas.
 
+---
+
+## Próximos passos e Evolução
+
+Minha meta é aprofundar a automação em nível de código, elevando a robustez dos testes para o ecossistema Java:
+* **Migração para Java:** O próximo marco deste projeto é a implementação da suíte utilizando Java. O objetivo é aplicar os 17 TCs em uma estrutura de código fortemente tipada, demonstrando domínio em automação de alto nível para integração contínua.
+* **Implementação de Reports Avançados:** Integrar dashboards profissionais para facilitar a leitura de resultados por stakeholders e times de desenvolvimento.
+
+---
 
 ## Autor
 
 ### Tobias Soares
-*Estudante de Ciências da Computação | Java Back-end Developer*
+*Estudante de Ciências da Computação*
 
 [GitHub](https://www.google.com/search?q=https://github.com/SoaresDev7) | [LinkedIn](https://www.linkedin.com/in/tobias-soares-639721364/)
