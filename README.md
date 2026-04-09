@@ -102,7 +102,6 @@ Durante a automação, identifiquei comportamentos divergentes da documentação
 Este projeto utilizou modelos de linguagem avançados como o Gemini e o NotebookLM para acelerar o ciclo de desenvolvimento dos testes. O foco não foi a geração automática de código, mas sim o uso da IA como um revisor técnico e estrategista.
 
 ### **Como a IA foi utilizada:**
-*   **Consulta direta na documentação da API:** Consulta à documentação da Restful-Book API para otimizar tempo e melhor legibilidade.
 *   **Refinamento de nomenclatura:** Padronização dos Test Cases (TCs) seguindo padrões de mercado para melhor legibilidade e manutenção.
 *   **Engenharia de Prompt para documentação:** Estruturação de descrições em Markdown para as requisições e para o README, garantindo uma comunicação técnica clara.
 *   **Análise de código:** Revisão de scripts de teste para identificar pontos de melhoria em asserções e mensagens de erro personalizadas.
