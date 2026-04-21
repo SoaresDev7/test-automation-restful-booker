@@ -1,17 +1,18 @@
-// ***********************************************************
-// This example support/e2e.js is processed and
-// loaded automatically before your test files.
-//
-// This is a great place to put global configuration and
-// behavior that modifies Cypress.
-//
-// You can change the location of this file or turn off
-// automatically serving support files with the
-// 'supportFile' configuration option.
-//
-// You can read more here:
-// https://on.cypress.io/configuration
-// ***********************************************************
+import './commands/api_commands'
+import './commands/ui_commands'
+import 'cypress-plugin-api';
+import addContext from "mochawesome/src/addContext";
 
-// Import commands.js using ES2015 syntax:
-import './commands'
+
+Cypress.on('test:after:run', (test, runnable) => {
+    if (test.state === 'failed') {
+        const screenshot = `assets/${Cypress.spec.name}/${runnable.parent.title} -- ${test.title} (failed).png`;
+        addContext({ test }, screenshot);
+    }
+});
+
+Cypress.on('uncaught:exception', (err, runnable) => {
+    if (err.message.includes('Minified React error #418') || err.message.includes('Hydration')) {
+        return false;
+    }
+});

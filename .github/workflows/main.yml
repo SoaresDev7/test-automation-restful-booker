@@ -1,5 +1,11 @@
-name: End-to-End Tests
-on: [push]
+name: Cypress Regression Tests
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
@@ -9,6 +15,20 @@ jobs:
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
+        continue-on-error: true
         with:
-          build: npm install
-          start: npm test
+          browser: chrome
+          spec: cypress/e2e/**/*
+          record: true
+        env:
+          CYPRESS_BASE_URL: https://restful-booker.herokuapp.com
+          CYPRESS_platformUrl: https://automationintesting.online
+          CYPRESS_RECORD_KEY: ${{secrets.CYPRESS_RECORD_KEY}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Save Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Relatorio-Mochawesome
+          path: cypress/reports

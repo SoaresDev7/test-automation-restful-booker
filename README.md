@@ -12,7 +12,7 @@ Este projeto apresenta uma suíte de testes automatizados para a **Restful-Booke
 ## Estrutura do Repositório
 O projeto foi organizado para demonstrar versatilidade no uso de ferramentas de QA:
 *   `postman/` : Contém a Collection e o Environment prontos para a importação.
-*   `cypress/` : Contém os scripts de automação (`/e2e/booking.cy.js`) e configurações.
+*   `cypress/` : Contém os scripts de automação (`/e2e/booking_api.cy.js`) e configurações.
 *   `README.md` : Documentação técnica e relatórios de bugs.
 
 ## Estratégia de Testes

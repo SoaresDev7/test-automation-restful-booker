@@ -4,15 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "cypress:open": "cypress open",
-    "cypress:run": "cypress run",
-    "test": "cypress run"
+    "clean:reports": "if exist cypress\\reports (rd /s /q cypress\\reports)",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "test": "npm run clean:reports && npm run cy:run"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "cypress": "^15.13.0"
+    "@faker-js/faker": "^10.4.0",
+    "cypress": "^15.13.0",
+    "cypress-plugin-api": "^2.11.2",
+    "mochawesome": "^7.1.4"
   }
 }
