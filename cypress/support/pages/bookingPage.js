@@ -7,6 +7,12 @@ class BookingPage {
     get inputPhone() { return cy.get('.room-phone'); }
     get btnSubmit() { return cy.get('.d-grid > .btn'); }
     get btnCheckAvailability(){return cy.get('.col-8 > .btn');}
+    get inputCheckin() {
+        return cy.get(':nth-child(1) > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control');
+    }
+    get inputCheckout() {
+        return cy.get(':nth-child(2) > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control');
+    }
 
     reservarQuartoCompleto(firstName, lastName, email, phone) {
         this.btnReserveThisRoom.click();

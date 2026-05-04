@@ -88,8 +88,8 @@ describe('UI RestFul-Booker Platform - Suíte Completa de Interface', () => {
                 return date.toLocaleDateString('pt-BR');
             };
 
-            cy.get(':nth-child(1) > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control').clear().type(formatDate(dateCheckin));
-            cy.get(':nth-child(2) > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control').clear().type(formatDate(dateCheckout));
+            bookingPage.inputCheckin.clear().type(formatDate(dateCheckin));
+            bookingPage.inputCheckout.clear().type(formatDate(dateCheckout));
 
 
             bookingPage.btnCheckAvailability.click();

@@ -8,22 +8,20 @@ describe('API RestFul-Booker - Suíte completa', () => {
 
   context('Fluxo funcional - Gestão de reservas (CRUD)', () => {
     it('TC04/05/17 - Deve criar reserva e validar contrato de dados', () => {
-      cy.generateBookingPayload().then((payload) => {
-        cy.createBookingApi(payload).then((res) => {
+        cy.createBookingApi().then((res) => {
+          const payload = res.body.booking;
+
           expect(res.status).to.eq(200);
           expect(res.duration).to.be.lessThan(1000);
 
           const bookingId = res.body.bookingid;
 
-          expect(res.body.booking).to.have.all.keys(
-              'firstname', 'lastname', 'totalprice', 'depositpaid', 'bookingdates', 'additionalneeds'
-          );
+          cy.validateBookingSchema(res.body.booking);
 
           cy.api(`/booking/${bookingId}`)
               .its('body.firstname')
               .should('eq', payload.firstname);
         });
-      });
     });
 
     it('TC06 - Deve atualizar uma reserva existente com novos dados dinâmicos', () => {
@@ -58,13 +56,10 @@ describe('API RestFul-Booker - Suíte completa', () => {
         ];
 
         securityCases.forEach((c) => {
-          cy.api({
-            method: c.method,
-            url: c.url,
-            body: c.body,
-            headers: c.headers,
-            failOnStatusCode: false
-          }).its('status').should('eq', c.status);
+          it(`${c.id} - Deve retornar ${c.status} para ${c.method} ${c.url}`, () => {
+            cy.api({ ...c, failOnStatusCode: false })
+                .its('status').should('eq', c.status);
+          });
         });
       });
     });

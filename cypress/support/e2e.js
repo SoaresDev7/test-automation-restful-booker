@@ -1,5 +1,4 @@
 import './commands/api_commands'
-import './commands/ui_commands'
 import 'cypress-plugin-api';
 import addContext from "mochawesome/src/addContext";
 
