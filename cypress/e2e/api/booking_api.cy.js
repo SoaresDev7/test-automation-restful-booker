@@ -27,18 +27,17 @@ describe('API RestFul-Booker - Suíte completa', () => {
     it('TC06 - Deve atualizar uma reserva existente com novos dados dinâmicos', () => {
       cy.createBookingApi().then((res) => {
         const id = res.body.bookingid;
+        const payload = res.body.booking;
 
-        cy.generateBookingPayload().then((newPayload) => {
           cy.api({
             method: 'PUT',
             url: `/booking/${id}`,
             headers: { Cookie: `token=${Cypress.env('token')}` },
-            body: newPayload
+            body: payload
           }).then((response) => {
             expect(response.status).to.eq(200);
-            expect(response.body.firstname).to.eq(newPayload.firstname);
+            expect(response.body.firstname).to.eq(payload.firstname);
           });
-        });
       });
     });
   });
