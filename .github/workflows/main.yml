@@ -18,12 +18,7 @@ jobs:
         continue-on-error: true
         with:
           browser: chrome
-          jobs:
-            api-tests:
-              spec: cypress/e2e/api/**/*
-
-            ui-tests:
-              spec: cypress/e2e/ui/**/*
+          spec: cypress/e2e/**/*
           record: true
         env:
           CYPRESS_BASE_URL: https://restful-booker.herokuapp.com
