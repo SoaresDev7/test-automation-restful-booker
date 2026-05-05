@@ -32,3 +32,23 @@ jobs:
         with:
           name: Relatorio-Mochawesome
           path: cypress/reports
+
+      - name: Upload Report to AWS S3
+        if: always()
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          aws s3 sync cypress/reports s3://relatorios-cypress-soaresdev7/runs/${{ github.run_id }} \
+            --acl public-read \
+            --exclude "*" \
+            --include "*.html" \
+            --include "*.json" \
+            --include "assets/**"
+
+      - name: Print Report URL
+        if: always()
+        run: |
+          echo "Relatório disponível em:"
+          echo "http://relatorios-cypress-soaresdev7.s3-website-us-east-1.amazonaws.com/runs/${{ github.run_id }}/mochawesome.html"
