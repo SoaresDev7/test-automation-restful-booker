@@ -83,8 +83,6 @@ por `run_id`, garantindo histórico imutável de todas as execuções:
 http://relatorios-cypress-soaresdev7.s3-website-us-east-1.amazonaws.com/runs/{run_id}/mochawesome.html
 ```
 
-As credenciais são gerenciadas exclusivamente via GitHub Secrets — sem nenhuma
-exposição no código-fonte.
 
 ### Cypress Cloud
 Dashboard com histórico de execuções, vídeos, screenshots e análise de estabilidade:
@@ -100,8 +98,8 @@ O pipeline executa automaticamente a cada `push` ou `pull_request`:
 1. Checkout do repositório
 2. Execução da suíte completa via `cypress-io/github-action@v6` (Chrome, headless)
 3. Gravação dos resultados no Cypress Cloud
-4. Upload do relatório Mochawesome como artefato da run (`if: always()`)
-5. Sincronização do relatório para AWS S3 com path por `run_id` (`if: always()`)
+4. Upload do relatório Mochawesome como artefato da run
+5. Sincronização do relatório para AWS S3
 6. Log da URL pública do relatório no console da run
 
 > `continue-on-error: true` está configurado intencionalmente — o projeto monitora
