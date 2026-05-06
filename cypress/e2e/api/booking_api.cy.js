@@ -21,27 +21,6 @@ describe('API RestFul-Booker - Suíte completa', () => {
               .should('eq', payload.firstname);
         });
     });
-
-    it.only('TC06 - Deve atualizar uma reserva existente com novos dados dinâmicos', () => {
-      cy.createBookingApi().then((resBooking) => {
-        const id = resBooking.body.bookingid;
-        const payload = resBooking.body.booking;
-
-        cy.getTokenApi().then((tokenValue) => {
-          cy.api({
-                method: 'PUT',
-                url: `/booking/${id}`,
-                headers: {
-                    Cookie: `token=${tokenValue}`
-                },
-                body: payload,
-                failOnStatusCode: false
-            }).then(response => {
-                expect(response.status).to.eq(200);
-          });
-        });
-      });
-    });
   });
 
   context('Negativos e Segurança - Resiliência do sistema', () => {
@@ -66,7 +45,29 @@ describe('API RestFul-Booker - Suíte completa', () => {
     });
   });
 
-  context('Regras de Negócio - Monitoramento de Bugs conhecidos', () => {
+  context('Regras de Negócio - Monitoramento de Bugs conhecidos e Instabilidades', () => {
+
+    it('TC06 - [INVESTIGAR] Erro 403 persistente na atualização (PUT)', () => {
+      cy.createBookingApi().then((resBooking) => {
+        const id = resBooking.body.bookingid;
+        const payload = resBooking.body.booking;
+
+        cy.getTokenApi().then((tokenValue) => {
+          cy.api({
+                method: 'PUT',
+                url: `/booking/${id}`,
+                headers: {
+                    Cookie: `token=${tokenValue}`
+                },
+                body: payload,
+                failOnStatusCode: false
+            }).then(response => {
+                expect(response.status).to.eq(200);
+          });
+        });
+      });
+    });
+
     const bugs = [
       { id: 'TC14', desc: 'Checkout retroativo', data: { bookingdates: { checkin: "2026-05-10", checkout: "2026-05-01" } } },
       { id: 'TC15', desc: 'Preço negativo', data: { totalprice: -100 } },
