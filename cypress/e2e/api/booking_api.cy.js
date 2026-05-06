@@ -23,26 +23,25 @@ describe('API RestFul-Booker - Suíte completa', () => {
     });
 
     it.only('TC06 - Deve atualizar uma reserva existente com novos dados dinâmicos', () => {
-      cy.createBookingApi().then((res) => {
-        const id = res.body.bookingid;
-        const payload = res.body.booking;
+      cy.createBookingApi().then((resBooking) => {
+        const id = resBooking.body.bookingid;
+        const payload = resBooking.body.booking;
 
+        cy.getTokenApi().then((token) => {
           cy.api({
-              method: 'PUT',
-              url: `/booking/${id}`,
-              headers: {
-                Cookie: `token=${Cypress.env('token')}`
-              },
-              body: payload,
-              failOnStatusCode: false
-            }).then(response => {
-              if (Cypress.env('token') === undefined) {
-                expect(response.status).to.eq(403);
-                expect(response.body).to.eq('Forbidden');
-              } else {
-                expect(response.status).to.eq(200);
-              }
+            method: 'PUT',
+            url: `/booking/${id}`,
+            headers: {
+              'Cookie': `token=${token}`,
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: payload,
+            failOnStatusCode: false
+          }).then((resPut) => {
+            expect(resPut.status).to.eq(200, `O token usado foi: ${token}`);
           });
+        });
       });
     });
   });
