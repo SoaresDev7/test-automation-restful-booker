@@ -41,7 +41,6 @@ jobs:
           AWS_DEFAULT_REGION: us-east-1
         run: |
           aws s3 sync cypress/reports s3://relatorios-cypress-soaresdev7/runs/${{ github.run_id }}/api \
-            --acl public-read \
             --exclude "*" \
             --include "*.html" \
             --include "*.json" \
@@ -81,7 +80,6 @@ jobs:
           AWS_DEFAULT_REGION: us-east-1
         run: |
           aws s3 sync cypress/reports s3://relatorios-cypress-soaresdev7/runs/${{ github.run_id }}/ui \
-            --acl public-read \
             --exclude "*" \
             --include "*.html" \
             --include "*.json" \
