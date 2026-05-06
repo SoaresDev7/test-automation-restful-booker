@@ -18,10 +18,13 @@ const bookingSchema = {
 
 
 Cypress.Commands.add('getTokenApi', () => {
-    cy.request({
+    return cy.request({
         method: 'POST',
         url: 'https://restful-booker.herokuapp.com/auth',
-        body: { username: Cypress.env('auth_username'), password: Cypress.env('auth_password') }
+        body: { 
+            username: Cypress.env('auth_username'), 
+            password: Cypress.env('auth_password') 
+        }
     }).then((res) => {
         Cypress.env('token', res.body.token);
     });
