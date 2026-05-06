@@ -2,7 +2,13 @@ describe('API RestFul-Booker - Suíte completa', () => {
 
   beforeEach(() => {
     cy.session('adminSession', () => {
-      cy.getTokenApi();
+        cy.getTokenApi();
+    }, {
+        validate() {
+            if (!Cypress.env('token')) {
+                cy.getTokenApi();
+            }
+        }
     });
   });
 

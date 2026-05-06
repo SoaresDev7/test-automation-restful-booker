@@ -7,53 +7,98 @@ permissions:
   pull-requests: write
 
 jobs:
-  cypress-run:
+  api-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Cypress run
+      - name: Cypress run — API
         uses: cypress-io/github-action@v6
         continue-on-error: true
         with:
           browser: chrome
-          spec: cypress/e2e/**/*
+          spec: cypress/e2e/api/**/*
           record: true
         env:
           CYPRESS_BASE_URL: https://restful-booker.herokuapp.com
           CYPRESS_platformUrl: https://automationintesting.online
-          CYPRESS_RECORD_KEY: ${{secrets.CYPRESS_RECORD_KEY}}
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Save Report
+      - name: Save API Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Relatorio-Mochawesome
+          name: Relatorio-API
           path: cypress/reports
 
-      - name: Upload Report to AWS S3
+      - name: Upload API Report to AWS S3
         if: always()
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
         run: |
-          aws s3 sync cypress/reports s3://relatorios-cypress-soaresdev7/runs/${{ github.run_id }} \
+          aws s3 sync cypress/reports s3://relatorios-cypress-soaresdev7/runs/${{ github.run_id }}/api \
+            --acl public-read \
             --exclude "*" \
             --include "*.html" \
             --include "*.json" \
             --include "assets/**"
 
-      - name: Print Report URL
+  ui-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cypress run — UI
+        uses: cypress-io/github-action@v6
+        continue-on-error: true
+        with:
+          browser: chrome
+          spec: cypress/e2e/ui/**/*
+          record: true
+        env:
+          CYPRESS_BASE_URL: https://restful-booker.herokuapp.com
+          CYPRESS_platformUrl: https://automationintesting.online
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Save UI Report
         if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Relatorio-UI
+          path: cypress/reports
+
+      - name: Upload UI Report to AWS S3
+        if: always()
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          aws s3 sync cypress/reports s3://relatorios-cypress-soaresdev7/runs/${{ github.run_id }}/ui \
+            --acl public-read \
+            --exclude "*" \
+            --include "*.html" \
+            --include "*.json" \
+            --include "assets/**"
+
+  summary:
+    runs-on: ubuntu-latest
+    needs: [api-tests, ui-tests]
+    if: always()
+    steps:
+      - name: Job Summary
         run: |
           echo "## Relatórios de Teste" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Suíte | Link |" >> $GITHUB_STEP_SUMMARY
           echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
-          echo "| API | [Abrir relatório](http://relatorios-cypress-soaresdev7.s3-website-us-east-1.amazonaws.com/runs/${{ github.run_id }}/mochawesome.html) |" >> $GITHUB_STEP_SUMMARY
-          echo "| UI  | [Abrir relatório](http://relatorios-cypress-soaresdev7.s3-website-us-east-1.amazonaws.com/runs/${{ github.run_id }}/mochawesome_001.html) |" >> $GITHUB_STEP_SUMMARY
+          echo "| API | [Abrir relatório](http://relatorios-cypress-soaresdev7.s3-website-us-east-1.amazonaws.com/runs/${{ github.run_id }}/api/mochawesome.html) |" >> $GITHUB_STEP_SUMMARY
+          echo "| UI  | [Abrir relatório](http://relatorios-cypress-soaresdev7.s3-website-us-east-1.amazonaws.com/runs/${{ github.run_id }}/ui/mochawesome.html) |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "> Run ID: \`${{ github.run_id }}\`" >> $GITHUB_STEP_SUMMARY
