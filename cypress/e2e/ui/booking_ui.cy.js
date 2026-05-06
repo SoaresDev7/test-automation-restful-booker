@@ -13,7 +13,7 @@ describe('UI RestFul-Booker Platform - Suíte Completa de Interface', () => {
             const email = faker.internet.email();
             const phone = faker.string.numeric(11);
 
-            bookingPage.preencherFormContato(name, email, phone);
+            bookingPage.fillOutContactForm(name, email, phone);
 
             cy.get('.col-lg-8 > .card > .card-body').should('contain', `Thanks for getting in touch ${name}!`);
         });
@@ -40,21 +40,15 @@ describe('UI RestFul-Booker Platform - Suíte Completa de Interface', () => {
                 return date.toLocaleDateString('pt-BR');
             };
 
-            cy.get(':nth-child(1) > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control').clear().type(formatDate(dateCheckin));
-            cy.get(':nth-child(2) > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control').clear().type(formatDate(dateCheckout));
+            bookingPage.inputCheckin.clear().type(formatDate(dateCheckin));
+            bookingPage.inputCheckout.clear().type(formatDate(dateCheckout));
 
 
             bookingPage.btnCheckAvailability.click();
 
             bookingPage.btnBookThisRoom.click();
-            bookingPage.reservarQuartoCompleto(firstName,lastName,email,phone);
-
-            cy.get('body').then(($body) => {
-                if (!$body.text().includes('Booking Confirmed')) {
-                    cy.screenshot('falha-aplicacao-confirmacao');
-                    throw new Error('A aplicação não processou a reserva mesmo com dados corretos (Bug Intermitente de UI)');
-                }
-            });
+            bookingPage.bookEntireRoom(firstName,lastName,email,phone);
+            bookingPage.confirmBooking;
         });
 
         it('TC10/13 (UI) - Deve impedir reserva com dados incompletos', () => {
@@ -81,28 +75,22 @@ describe('UI RestFul-Booker Platform - Suíte Completa de Interface', () => {
             const lastName = faker.person.lastName();
             const email = faker.internet.email();
             const phone = faker.string.numeric(12);
-
+            
             const dateCheckin = faker.date.future();
             const dateCheckout = faker.date.past({refDate: dateCheckin});
             const formatDate = (date) => {
                 return date.toLocaleDateString('pt-BR');
             };
-
+            
             bookingPage.inputCheckin.clear().type(formatDate(dateCheckin));
             bookingPage.inputCheckout.clear().type(formatDate(dateCheckout));
-
-
+            
+            
             bookingPage.btnCheckAvailability.click();
-
+            
             bookingPage.btnBookThisRoom.click();
-            bookingPage.reservarQuartoCompleto(firstName,lastName,email,phone);
-
-            cy.get('body').then(($body) => {
-                if (!$body.text().includes('Booking Confirmed')) {
-                    cy.screenshot('falha-aplicacao-confirmacao');
-                    throw new Error('A aplicação não processou a reserva (Bug Intermitente de UI)');
-                }
-            });
+            bookingPage.bookEntireRoom(firstName,lastName,email,phone);
+            bookingPage.reportImproperConfirmation;
         });
     });
 });

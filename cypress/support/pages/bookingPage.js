@@ -14,7 +14,28 @@ class BookingPage {
         return cy.get(':nth-child(2) > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control');
     }
 
-    reservarQuartoCompleto(firstName, lastName, email, phone) {
+    get confirmBooking(){
+        cy.get(':nth-child(1) > .col-lg-4 > .card > .card-body')
+            .should('be.visible')
+            .contains('h2', 'Booking Confirmed');
+
+        cy.get(':nth-child(1) > .col-lg-4 > .card > .card-body > .btn').should('be.visible').click();
+    }
+
+    get reportImproperConfirmation() {
+        cy.get('body').then(($body) => {
+            if ($body.text().includes('Booking Confirmed')) {
+                cy.screenshot('bug-ui-datas-invalidas-aceitas');
+                throw new Error(
+                    'BUG ATIVO (UI): Interface confirmou reserva com datas inválidas. ' +
+                    'Esperado: rejeitar checkout anterior ao checkin.'
+                );
+            }
+        });
+    }
+
+
+    bookEntireRoom(firstName, lastName, email, phone) {
         this.btnReserveThisRoom.click();
 
         this.inputFirstName.type(firstName);
@@ -26,7 +47,7 @@ class BookingPage {
         this.btnReserveThisRoom.click();
     }
 
-    preencherFormContato(nome, email, fone) {
+    fillOutContactForm(nome, email, fone) {
         cy.get('[data-testid="ContactName"]').type(nome);
         cy.get('[data-testid="ContactEmail"]').type(email);
         cy.get('[data-testid="ContactPhone"]').type(fone);

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "clean:reports": "if exist cypress\\reports (rd /s /q cypress\\reports)",
+    "clean:reports": "node scripts/clean-reports.js",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "test": "npm run clean:reports && npm run cy:run"
