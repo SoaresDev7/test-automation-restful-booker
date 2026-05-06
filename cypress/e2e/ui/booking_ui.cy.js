@@ -15,15 +15,12 @@ describe('UI RestFul-Booker Platform - Suíte Completa de Interface', () => {
 
             bookingPage.fillOutContactForm(name, email, phone);
 
-            cy.get('.col-lg-8 > .card > .card-body').should('contain', `Thanks for getting in touch ${name}!`);
+            bookingPage.validateContactSuccess(name);
         });
 
         it('TC19 - Deve validar mensagens de erro no formulário de contato vazio', () => {
             bookingPage.btnSubmit.click();
-
-            cy.get('.alert-danger').should('be.visible');
-            cy.contains('Subject may not be blank').should('be.visible');
-            cy.contains('Message must be between 20 and 2000 characters').should('be.visible');
+            bookingPage.validateContactErrorMessages();
         });
     });
 

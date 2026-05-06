@@ -7,6 +7,8 @@ class BookingPage {
     get inputPhone() { return cy.get('.room-phone'); }
     get btnSubmit() { return cy.get('.d-grid > .btn'); }
     get btnCheckAvailability(){return cy.get('.col-8 > .btn');}
+    get contactSuccessMessage() { return cy.get('.col-lg-8 > .card > .card-body'); }
+    get alertErrorMessage() { return cy.get('.alert-danger'); }
     get inputCheckin() {
         return cy.get(':nth-child(1) > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control');
     }
@@ -54,6 +56,18 @@ class BookingPage {
         cy.get('[data-testid="ContactSubject"]').type('Reserva de Teste');
         cy.get('[data-testid="ContactDescription"]').type('Esta é uma mensagem de automação para validar o formulário.');
         this.btnSubmit.click();
+    }
+
+    validateContactSuccess(name) {
+        this.contactSuccessMessage
+            .should('be.visible')
+            .and('contain', `Thanks for getting in touch ${name}!`);
+    }
+
+    validateContactErrorMessages() {
+        this.alertErrorMessage.should('be.visible');
+        cy.contains('Subject may not be blank').should('be.visible');
+        cy.contains('Message must be between 20 and 2000 characters').should('be.visible');
     }
 }
 export default new BookingPage();
