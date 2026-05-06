@@ -33,10 +33,6 @@ jobs:
           name: Relatorio-Mochawesome
           path: cypress/reports
 
-      - name: Debug — listar relatórios gerados
-        if: always()
-        run: ls -la cypress/reports/
-
       - name: Upload Report to AWS S3
         if: always()
         env:
@@ -53,5 +49,6 @@ jobs:
       - name: Print Report URL
         if: always()
         run: |
-          echo "Relatório disponível em:"
-          echo "http://relatorios-cypress-soaresdev7.s3-website-us-east-1.amazonaws.com/runs/${{ github.run_id }}/mochawesome.html"
+          echo "=== Relatórios disponíveis ==="
+          echo "API:  http://relatorios-cypress-soaresdev7.s3-website-us-east-1.amazonaws.com/runs/${{ github.run_id }}/mochawesome.html"
+          echo "UI:   http://relatorios-cypress-soaresdev7.s3-website-us-east-1.amazonaws.com/runs/${{ github.run_id }}/mochawesome_001.html"
