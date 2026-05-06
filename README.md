@@ -93,7 +93,9 @@ Dashboard com histórico de execuções, vídeos, screenshots e análise de esta
 
 ## CI/CD — GitHub Actions
 
-O pipeline executa automaticamente a cada `push` ou `pull_request`:
+O pipeline executa automaticamente a cada `push` ou `pull_request` com **três jobs**:
+ 
+**`api-tests`** e **`ui-tests`** rodam em paralelo em máquinas independentes:
 
 1. Checkout do repositório
 2. Execução da suíte completa via `cypress-io/github-action@v6` (Chrome, headless)
@@ -118,7 +120,6 @@ Cada bug possui um teste automatizado de monitoramento na suíte:
 | **BUG-01** | Alta | Aceita checkout anterior ao checkin | `400 Bad Request` | Ativo  |
 | **BUG-02** | Crítica | Aceita preço negativo | Rejeitar valor negativo | Ativo  |
 | **BUG-03** | Média | Aceita string no campo numérico de preço | `400 Bad Request` | Ativo  |
-| **BUG-04** | Baixa | Falha na negociação de conteúdo via header `Accept` | `418 I'm a teapot` |  Ativo |
 
 ---
 
