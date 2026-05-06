@@ -27,19 +27,17 @@ describe('API RestFul-Booker - Suíte completa', () => {
         const id = resBooking.body.bookingid;
         const payload = resBooking.body.booking;
 
-        cy.getTokenApi().then((token) => {
+        cy.getTokenApi().then((tokenValue) => {
           cy.api({
-            method: 'PUT',
-            url: `/booking/${id}`,
-            headers: {
-              'Cookie': `token=${token}`,
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: payload,
-            failOnStatusCode: false
-          }).then((resPut) => {
-            expect(resPut.status).to.eq(200, `O token usado foi: ${token}`);
+                method: 'PUT',
+                url: `/booking/${id}`,
+                headers: {
+                    Cookie: `token=${tokenValue}`
+                },
+                body: payload,
+                failOnStatusCode: false
+            }).then(response => {
+                expect(response.status).to.eq(200);
           });
         });
       });

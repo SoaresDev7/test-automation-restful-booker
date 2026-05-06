@@ -26,7 +26,9 @@ Cypress.Commands.add('getTokenApi', () => {
             password: Cypress.env('auth_password') 
         }
     }).then((res) => {
-        Cypress.env('token', res.body.token);
+        const tokenString = res.body.token;
+        Cypress.env('token', tokenString);
+        return tokenString;
     });
 });
 Cypress.Commands.add('createBookingApi', (overrides = {}) => {
