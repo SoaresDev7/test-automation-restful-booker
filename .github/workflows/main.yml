@@ -49,6 +49,11 @@ jobs:
       - name: Print Report URL
         if: always()
         run: |
-          echo "=== Relatórios disponíveis ==="
-          echo "API:  http://relatorios-cypress-soaresdev7.s3-website-us-east-1.amazonaws.com/runs/${{ github.run_id }}/mochawesome.html"
-          echo "UI:   http://relatorios-cypress-soaresdev7.s3-website-us-east-1.amazonaws.com/runs/${{ github.run_id }}/mochawesome_001.html"
+          echo "## Relatórios de Teste" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Suíte | Link |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| API | [Abrir relatório](http://relatorios-cypress-soaresdev7.s3-website-us-east-1.amazonaws.com/runs/${{ github.run_id }}/mochawesome.html) |" >> $GITHUB_STEP_SUMMARY
+          echo "| UI  | [Abrir relatório](http://relatorios-cypress-soaresdev7.s3-website-us-east-1.amazonaws.com/runs/${{ github.run_id }}/mochawesome_001.html) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> Run ID: \`${{ github.run_id }}\`" >> $GITHUB_STEP_SUMMARY
