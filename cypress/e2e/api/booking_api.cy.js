@@ -24,7 +24,7 @@ describe('API RestFul-Booker - Suíte completa', () => {
   });
 
   context('Negativos e Segurança - Resiliência do sistema', () => {
-    it('TC08 a TC13 - Deve validar tratamento de erros e permissões', () => {
+    it('TC08 a TC13 - Deve validar tratamento de erros e permissões ', () => {
       cy.createBookingApi().then((res) => {
         const tempId = res.body.bookingid;
 
